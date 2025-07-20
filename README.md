@@ -21,13 +21,13 @@ The input ROM directory usually has all files in a flat structure. After organiz
 2 Japan
 2 Other Regions
 2 Revisions
-2 Variations
 3 Collections
 4 Betas & Protos
 4 Demos & Samples
 4 Pirate
 4 Programs
 4 Unlicensed
+4 Various
 5 Hacks
 5 Translations
 6 BIOS
@@ -40,34 +40,37 @@ There is an optional INI file (urs.ini ) that can be used to customize a few asp
 
 ```
 [Settings]
-FileCount = 384
+FileLimit = 384
 
 [Folders]
-USA = "1 USA"
-World = "1 World"
-Europe = "2 Europe"
-Japan = "2 Japan"
-OtherRegions = "2 Other Regions"
-Revisions = "2 Revisions"
-Variations = "2 Variations"
-GameCollections = "3 Collections\Game Series"
-PublisherCollections = "3 Collections\Publishers"
-SystemCollections = "3 Collections\Systems"
-VariousCollections = "3 Collections\Various"
-Betas = "4 Betas & Protos\Betas"
-Protos = "4 Betas & Protos\Protos"
-Demos = "4 Demos & Samples\Demos"
-Samples = "4 Demos & Samples\Samples"
-Pirate = "4 Pirate"
-Programs = "4 Programs"
-Aftermarket = "4 Unlicensed\Aftermarket"
-Unlicensed = "4 Unlicensed\Unlicensed"
-Hacks = "5 Hacks"
-Translations = "5 Translations"
-BIOS = "6 BIOS"
+USA = 1 USA
+World = 1 World
+Europe = 2 Europe
+Japan = 2 Japan
+OtherRegions = 2 Other Regions
+Revisions = 2 Revisions
+DeveloperCollections = 3 Collections\Developers
+GameCollections = 3 Collections\Game Series
+PublisherCollections = 3 Collections\Publishers
+SystemCollections = 3 Collections\Systems
+VariousCollections = 3 Collections\Various
+Betas = 4 Betas & Protos\Betas
+Protos = 4 Betas & Protos\Protos
+Demos = 4 Demos & Samples\Demos
+Samples = 4 Demos & Samples\Samples
+Pirate = 4 Pirate
+Programs = 4 Programs
+Aftermarket = 4 Unlicensed\Aftermarket
+Unlicensed = 4 Unlicensed\Unlicensed
+Various = 4 Various
+Hacks = 5 Hacks
+Translations = 5 Translations
+BIOS = 6 BIOS
+
+[Rules]
 ```
 
-In the [Settings] section you can adjust FileCount. This is the threshold of files that are considered for alphabetical sorting. If a folder contains more files the alphabetical folders will be created and the files sorted accordingly.
+In the [Settings] section you can adjust FileLimit. This is the threshold of files that are considered for alphabetical sorting. If a folder contains more files the alphabetical folders will be created and the files sorted accordingly.
 
 In [Folders] you can adjust the names of all main folders that can be created. This also allows for restructuring the output.
 
