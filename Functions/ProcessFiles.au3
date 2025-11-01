@@ -45,7 +45,7 @@ Func ProcessFiles($Roms, $IniFile, $AllFolderRules, $Other)
                     Local $filename = StringRegExpReplace($file, '^.*\\', '')
                     If StringInStr($filename, $patterns[$j]) Then
                         Local $filename = StringTrimLeft($file, StringInStr($file, "\", 0, -1))
-                        FileMove($file, $targetFolder & "\" & $filename, 9)
+                        FileMove(LongPath($file), LongPath($targetFolder & "\" & $filename), 9)
                         $moved = True
                         ExitLoop 3
                     EndIf
@@ -56,7 +56,7 @@ Func ProcessFiles($Roms, $IniFile, $AllFolderRules, $Other)
         ; REMAINING FILES
         If Not $moved Then
             Local $filename = StringTrimLeft($file, StringInStr($file, "\", 0, -1))
-            FileMove($file, $Other & "\" & $filename, 9)
+            FileMove(LongPath($file), LongPath($Other & "\" & $filename), 9)
         EndIf
     Next
 EndFunc
@@ -97,7 +97,7 @@ Func CustomRules($sIniFile, $sRootFolder, $sFilePath, $sSection)
 
             ; MOVE FILES
             Local $sDest = $sTargetFolder & "\" & $sFileName
-            FileMove($sFilePath, $sDest, 1)
+            FileMove(LongPath($sFilePath), LongPath($sDest), 1)
 
             Return 1
         EndIf

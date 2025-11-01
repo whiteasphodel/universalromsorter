@@ -30,23 +30,41 @@ Func MoveBaseToRev($sFolderBase, $sFolderRev)
         Local $baseName = StringStripWS(StringRegExpReplace($filename, " ?\(Rev[^\)]*\)", ""), 3)
         Local $sourcePath = $sFolderBase & "\" & $baseName
         Local $destPath = $sFolderRev & "\" & $baseName
-        FileMove($sourcePath, $destPath, 1)
+        FileMove(LongPath($sourcePath), LongPath($destPath), 1)
 
-        ; EXCEPTIONS - MODIFY STRINGS AND MOVE TO REVISION FOLDER
+        ; TWEAKS - MODIFY STRINGS AND MOVE TO REVISION FOLDER
 		Global $Revision
         ;FDS
         TransformAndMove($sFolderBase, $Revision, $baseName, " (Disk Writer)", "")
         ; GBA
         TransformAndMove($sFolderBase, $Revision, $baseName, "(USA, Australia)", "(USA)")
         TransformAndMove($sFolderBase, $Revision, $baseName, "(USA)", "(USA, Europe)")
+        TransformAndMove($sFolderBase, $Revision, $baseName, "(En,Fr,De,Es,It,Sv,No,Da,Fi)", "(En,Fr,De,It,Sv,No,Da,Fi) (Rev 1)")
         ; GB
         TransformAndMove($sFolderBase, $Revision, $baseName, "(World)", "(Japan, USA) (En)")
         TransformAndMove($sFolderBase, $Revision, $baseName, " (SGB Enhanced)", "", "(USA, Europe)", "(USA)")
+		; GBC
+		TransformAndMove($sFolderBase, $Revision, $baseName, "(Europe)", "(Europe) (En,Es,Nl)")
+        TransformAndMove($sFolderBase, $Revision, $baseName, "(Europe)", "(Europe) (En,Fr,It)")
         ; PSX
         TransformAndMove($sFolderBase, $Revision, $baseName, "(De,Es,It)", "(En,Fr,De,Nl)")
         TransformAndMove($sFolderBase, $Revision, $baseName, "(En,Fr,Nl)", "(En,Fr,Es,It)")
+		TransformAndMove($sFolderBase, $Revision, $baseName, "(USA)", "(USA, Canada)")
+		TransformAndMove($sFolderBase, $Revision, $baseName, "(USA, Canada)", "(USA)")
+		TransformAndMove($sFolderBase, $Revision, $baseName, "(Europe, Australia)", "(Europe)")
         ; NES
         TransformAndMove($sFolderBase, $Revision, $baseName, "(NES-BK)", "(NES-N7)")
+        ; SMD
+        TransformAndMove($sFolderBase, $Revision, $baseName, "(World)", "(World) (En,Ja)")
+        TransformAndMove($sFolderBase, $Revision, $baseName, "(USA, Europe, Korea)", "(Japan, USA)")
+        TransformAndMove($sFolderBase, $Revision, $baseName, "(Japan, USA, Korea)", "(Japan, USA)")
+        TransformAndMove($sFolderBase, $Revision, $baseName, "(MDST17FF)", "(MDST6636)")
+        TransformAndMove($sFolderBase, $Revision, $baseName, "(USA)", "(USA, Europe) (F-202)")
+        TransformAndMove($sFolderBase, $Revision, $baseName, "(USA, Europe)", "(Japan, USA) (En)")
+        TransformAndMove($sFolderBase, $Revision, $baseName, "(USA, Europe)", "(Japan, USA) (En) (Rev 1)")
+        ; SMS
+        TransformAndMove($sFolderBase, $Revision, $baseName, "(USA, Europe, Brazil) (En)", "(USA, Europe)")
+        TransformAndMove($sFolderBase, $Revision, $baseName, "(Europe, Brazil)", "(Japan, Europe)")
 
         ; SORT REVISIONS FOLDER BY REGION
         RegionSort($Revision)
@@ -71,5 +89,5 @@ Func TransformAndMove( _
 
     Local $sourcePath = $sourceFolder & "\" & $newName
     Local $destPath = $destFolder & "\" & $newName
-    FileMove($sourcePath, $destPath, 1)
+    FileMove(LongPath($sourcePath), LongPath($destPath), 1)
 EndFunc

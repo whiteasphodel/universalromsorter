@@ -172,7 +172,7 @@ Local $RegionRules = [ _
                     Local $targetFolder = $Folder & "\" & $regionName
                     If Not FileExists($targetFolder) Then DirCreate($targetFolder)
 
-                    FileMove($file, $targetFolder & "\" & $filename, 9)
+                    FileMove(LongPath($file), LongPath($targetFolder & "\" & $filename), 9)
                     $moved = True
                     ExitLoop 2
                 EndIf
@@ -213,10 +213,8 @@ Func LicenseSort($Folder)
                     Local $targetFolder = $Folder & "\" & $licenseName
                     If Not FileExists($targetFolder) Then DirCreate($targetFolder)
 
-                    FileMove($file, $targetFolder & "\" & $filename, 9)
+                    FileMove(LongPath($file), LongPath($targetFolder & "\" & $filename), 9)
                     $moved = True
-
-                    If $licenseName = "Unlicensed" Then $bUnlicensedFound = True
                     ExitLoop 2
                 EndIf
             Next
@@ -230,18 +228,16 @@ Func LicenseSort($Folder)
         EndIf
     Next
 
-    ; SECOND PASS – MOVE REMAINING FILES IF UNLICENSED FOUND
-    If $bUnlicensedFound Then
-        Local $LicensedFolder = $Folder & "\Licensed"
-        If Not FileExists($LicensedFolder) Then DirCreate($LicensedFolder)
+    ; SECOND PASS – MOVE REMAINING FILES TO OFFICIAL
+	Local $LicensedFolder = $Folder & "\Official"
+	If Not FileExists($LicensedFolder) Then DirCreate($LicensedFolder)
 
-        For $i = 1 To $RemainingFiles[0]
-            Local $file = $RemainingFiles[$i]
-            Local $pos = StringInStr($file, "\", 0, -1)
-            Local $filename = StringTrimLeft($file, $pos)
-            FileMove($file, $LicensedFolder & "\" & $filename, 9)
-        Next
-    EndIf
+	For $i = 1 To $RemainingFiles[0]
+		Local $file = $RemainingFiles[$i]
+		Local $pos = StringInStr($file, "\", 0, -1)
+		Local $filename = StringTrimLeft($file, $pos)
+		FileMove(LongPath($file), LongPath($LicensedFolder & "\" & $filename), 9)
+	Next
 EndFunc
 
 ; SORT BY ALPHABET
@@ -293,7 +289,7 @@ Func SortByAlphabet($sFolder)
             EndIf
 
             ; MOVE FILES
-            FileMove($sFile, $sDestFolder & "\" & $sFileName)
+            FileMove(LongPath($sFile), LongPath($sDestFolder & "\" & $sFileName))
         Next
     EndIf
 EndFunc

@@ -61,7 +61,7 @@ Func MoveRevToBase($sFolderRev, $sFolderBase)
         If @error Then ContinueLoop
 
         For $j = 1 To $aMatches[0]
-            FileMove($sFolderRev & "\" & $aMatches[$j], $sFolderBase & "\" & $aMatches[$j], 1)
+            FileMove(LongPath($sFolderRev & "\" & $aMatches[$j]), LongPath($sFolderBase & "\" & $aMatches[$j]), 1)
         Next
     Next
 EndFunc

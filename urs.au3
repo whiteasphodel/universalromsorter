@@ -1,11 +1,10 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Icon=Assets\urs.ico
 #AutoIt3Wrapper_Outfile_x64=urs.exe
 #AutoIt3Wrapper_UseX64=y
 #AutoIt3Wrapper_Res_Description=URS
 #AutoIt3Wrapper_Res_Fileversion=1.0.0.0
 #AutoIt3Wrapper_Res_ProductName=Universal ROM Sorter
-#AutoIt3Wrapper_Res_ProductVersion=3.0.0.0
+#AutoIt3Wrapper_Res_ProductVersion=3.1.0.0
 #AutoIt3Wrapper_Res_LegalCopyright=© 2025 Asphodel
 #AutoIt3Wrapper_Res_Language=1033
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
@@ -37,10 +36,10 @@ TraySetToolTip("Universal ROM Sorter")
 ; MAIN
 #include <Array.au3>
 #include <File.au3>
-#include <Functions\DeleteEmptyFolders.au3>
 #include <Functions\MoveBaseToRev.au3>
 #include <Functions\MoveRevToBase.au3>
 #include <Functions\ProcessFiles.au3>
+#include <Functions\ProcessFolders.au3>
 #include <Functions\SortFiles.au3>
 
 ; PARAMETERS
@@ -75,8 +74,10 @@ $SystemCollection = $Roms & "\" & IniRead($IniFile, "Folders", "SystemCollection
 $VariousCollection = $Roms & "\" & IniRead($IniFile, "Folders", "VariousCollections", "3 Collections\Various")
 $SegaCd32x = $Roms & "\" & IniRead($IniFile, "Folders", "SegaCD32X", "3 Sega CD 32X")
 $Beta = $Roms & "\" & IniRead($IniFile, "Folders", "Betas", "4 Betas & Protos\Betas")
-$Proto = $Roms & "\" & IniRead($IniFile, "Folders", "Protos", "4 Betas & Protos\Protos")
 $Demo = $Roms & "\" & IniRead($IniFile, "Folders", "Demos", "4 Demos & Samples\Demos")
+$MultiGameDemo = $Roms & "\" & IniRead($IniFile, "Folders", "MultiGameDemos", "4 Demos & Samples\Multi-Game Demos")
+$Promo = $Roms & "\" & IniRead($IniFile, "Folders", "Promos", "4 Demos & Samples\Promos")
+$Proto = $Roms & "\" & IniRead($IniFile, "Folders", "Protos", "4 Betas & Protos\Protos")
 $Sample = $Roms & "\" & IniRead($IniFile, "Folders", "Samples", "4 Demos & Samples\Samples")
 $Pirate = $Roms & "\" & IniRead($IniFile, "Folders", "Pirate", "4 Pirate")
 $Program = $Roms & "\" & IniRead($IniFile, "Folders", "Programs", "4 Programs")
@@ -87,13 +88,30 @@ $Hack = $Roms & "\" & IniRead($IniFile, "Folders", "Hacks", "5 Hacks")
 $Translation = $Roms & "\" & IniRead($IniFile, "Folders", "Translations", "5 Translations")
 $Bios = $Roms & "\" & IniRead($IniFile, "Folders", "BIOS", "6 BIOS")
 
+; BUILT-IN PRESETS
+If $IniFile = "c" Or $IniFile = "compact" Then
+	$Beta = $Roms & "\4 Miscellaneous\Betas"
+	$Demo = $Roms & "\4 Miscellaneous\Demos"
+	$MultiGameDemo = $Roms & "\4 Miscellaneous\Multi-Game Demos"
+	$Program = $Roms & "\4 Miscellaneous\Programs"
+	$Promo = $Roms & "\4 Miscellaneous\Promos"
+	$Proto = $Roms & "\4 Miscellaneous\Protos"
+	$Sample = $Roms & "\4 Miscellaneous\Samples"
+	$Various = $Roms & "\4 Miscellaneous\Various"
+	$Bios = $Roms & "\4 Miscellaneous\Various\BIOS"
+EndIf
+
 ; DEFINE ARRAYS
 ; HACKS AND TRANSLATIONS
-Global $aNtscHack = ["PAL-to-NTSC"]
+Global $aNtscHack = [ _
+    "PAL-to-NTSC", _
+    "PAL to NTSC" _
+]
 Global $aColorHack = [ _
     "Color hack", _
     "Color fix", _
     "Color & SFX hack", _
+    "Arcade Colors", _
     "Arcade Edition by" _
 ]
 Global $aSpeedHack = [ _
@@ -113,7 +131,8 @@ Global $aHack = [ _
 ]
 Global $aTranslation = [ _
     "T-En", _
-    "[n]" _
+    "[n]", _
+    "Un-Worked Design" _
 ]
 ; EXCEPTIONS
 Global $aExceptionJapan = [ _
@@ -230,6 +249,7 @@ Global $aSysColMegaDriveMini = [ _
     "(Mega Drive Mini 2, Genesis Mini 2)" _
 ]
 Global $aSysColMegaDrivePlayTV = ["(Mega Drive PlayTV)"]
+Global $aSysColModRetroChromatic = ["(ModRetro Chromatic)"]
 Global $aSysColNintendoPower = ["(NP)"]
 Global $aSysColPCEngineMini = ["(PC Engine Mini)"]
 Global $aSysColRetroBitGenerations = ["(Retro-Bit Generations)"]
@@ -273,8 +293,7 @@ Global $aBeta = [ _
     "(Beta)", _
     "(Beta ", _
     "(Debug)", _
-    "(Debug Version)", _
-    "(SDK Build)" _
+    "(Debug Version)" _
 ]
 Global $aProto = [ _
     "(Proto)", _
@@ -300,11 +319,48 @@ Global $aDemo = [ _
     "(Trade Demo)", _
     "[Demo]" _
 ]
+Global $aMultiGameDemo = [ _
+    "Sampler Disc", _
+    "Interactive CD Sampler", _
+    "Interactive Sampler CD", _
+    "DemoDemo PlayStation", _
+    "Euro Demo", _
+    "Play Fun", _
+    "Play Zone", _
+    "PlayStation Zone", _
+    "PlayStation Underground", _
+    "Demo Disc", _
+    "Demo CD", _
+    "Demo One", _
+    "Registered User Demo", _
+    "McDonald's - Demo", _
+    "Demos", _
+    "PSone - Wherever, Whenever, Forever", _
+    "Pizza Hut Disc", _
+    "Pizza Hut Demo", _
+    "Squaresoft on PlayStation", _
+    "PS One Winter", _
+    "PlayStation Picks", _
+    "E3 Demo", _
+    "Essential PlayStation", _
+    "Kids Demo", _
+    "PS One Kids", _
+    "PS One Special Demo", _
+    "Namco Demo", _
+    "Next Demo", _
+    "Next Station", _
+    "Jampack Vol", _
+    "OPSM Best", _
+	"radicalgames@psygnosis" _
+]
 Global $aSample = [ _
     "(Sample)", _
-    "(Taikenban Sample ROM)", _
+    "(Taikenban Sample ROM)" _
+]
+Global $aPromo = [ _
     "(Promo)", _
     "(Doritos Promo)", _
+    "(Movie Promo)", _
     "(Caravan You Taikenban)", _
     "(JR Nishi-Nihon Presents)" _
 ]
@@ -313,6 +369,8 @@ Global $aProgram = [ _
     "(Program)", _
     "(Test Program)", _
     "(Menu Cart)", _
+    "Sample Program", _
+    "Check Program", _
     "Wide-Boy64", _
     "Aging Cartridge", _
     "Minolta", _
@@ -324,7 +382,8 @@ Global $aProgram = [ _
     "Color & Switch Test", _
     "Super Game Boy", _
     "Game Boy Controller Kensa Cartridge", _
-    "Game Boy Camera" _
+    "Game Boy Camera", _
+	"Analog Controller Service Disc" _
 ]
 ; UNLICENSED
 Global $aPirate = ["(Pirate)"]
@@ -339,14 +398,21 @@ Global $aUnlicensed = [ _
     "(Unlicensed)", _
     "[Unlicensed]" _
 ]
-; ALTERNATIVES / BAD DUMPS / SAMPLERS
+; VARIOUS
 Global $aAlternatives = [ _
     "(Alt)", _
     "(Alt ", _
     "(SNS-XM)", _
+    "(SCUS-94290)", _
+    "(SCUS-94439)", _
+    "(SLUS-00612)", _
     "(A8FE)" _
 ]
 Global $aBadDumps = ["[b]"]
+Global $aBonusDiscs = [ _
+    "(Bonus Disc)", _
+    "(Bonus PlayStation Disc)" _
+]
 Global $aEDC = ["(EDC)"]
 ; SEGA CD SPECIFIC
 Global $aSegaCd32x = [ _
@@ -381,7 +447,9 @@ Global $aEurope = [ _
     "(Europe, Australia)", _
     "(Europe, Brazil)", _
     "(Europe, Canada)", _
+    "(Europe, Germany)", _
     "(Europe, Hong Kong)", _
+    "(Europe, India)", _
     "(Europe, Korea)", _
     "(Japan, Europe)", _
     "(Japan, Europe, Australia)", _
@@ -484,6 +552,7 @@ Global $SystemCollections = [ _
         [$aSysColMegaDrive4, $SystemCollection & "\Mega Drive 4"], _
         [$aSysColMegaDriveMini, $SystemCollection & "\Mega Drive Mini"], _
         [$aSysColMegaDrivePlayTV, $SystemCollection & "\Mega Drive PlayTV"], _
+        [$aSysColModRetroChromatic, $SystemCollection & "\ModRetro Chromatic"], _
         [$aSysColNintendoPower, $SystemCollection & "\Nintendo Power"], _
         [$aSysColPCEngineMini, $SystemCollection & "\PC Engine Mini"], _
         [$aSysColRetroBitGenerations, $SystemCollection & "\Retro-Bit Generations"], _
@@ -510,13 +579,16 @@ Global $MajorSets = [ _
         [$aBeta, $Beta], _
         [$aProto, $Proto], _
         [$aDemo, $Demo], _
+        [$aMultiGameDemo, $MultiGameDemo], _
         [$aSample, $Sample], _
+        [$aPromo, $Promo], _
         [$aProgram, $Program], _
         [$aPirate, $Pirate], _
         [$aAftermarket, $Aftermarket], _
         [$aUnlicensed, $Unlicensed], _
         [$aAlternatives, $Various & "\Alternatives"], _
         [$aBadDumps, $Various & "\Bad Dumps"], _
+        [$aBonusDiscs, $Various & "\Bonus Discs"], _
         [$aEDC, $Various & "\EDC"], _
         [$aSegaCd32x, $SegaCd32x], _
         [$aRevision, $Revision] _
@@ -546,8 +618,10 @@ RegionSort($SegaCd32x)
 ; SORT FOLDERS BY LICENSE
 LicenseSort($Beta)
 LicenseSort($Demo)
+LicenseSort($Promo)
 LicenseSort($Program)
 LicenseSort($Proto)
+LicenseSort($Sample)
 
 ;  SWAP REVISIONS
 If $PreferRevisions = 1 Then
@@ -557,19 +631,18 @@ If $PreferRevisions = 1 Then
             For $i = 1 To $aSubDirs[0]
 
                 If $aSubDirs[$i] = "USA" Then
-                    $BaseRegion = IniRead($IniFile, "Folders", "USA", "1 USA")
+                    $BaseFolder = $Usa
                 ElseIf $aSubDirs[$i] = "World" Then
-                    $BaseRegion = IniRead($IniFile, "Folders", "World", "1 World")
+                    $BaseFolder = $World
                 ElseIf $aSubDirs[$i] = "Europe" Then
-                    $BaseRegion = IniRead($IniFile, "Folders", "Europe", "2 Europe")
+                    $BaseFolder = $Europe
                 ElseIf $aSubDirs[$i] = "Japan" Then
-                    $BaseRegion = IniRead($IniFile, "Folders", "Japan", "2 Japan")
+                    $BaseFolder = $Japan
                 Else
-                    $BaseRegion = IniRead($IniFile, "Folders", "OtherRegions", "2 Other Regions") & "\" & $aSubDirs[$i]
+                    $BaseFolder = $Other & "\" & $aSubDirs[$i]
                 EndIf
 
                 Local $RevisionFolder = $Revision & "\" & $aSubDirs[$i]
-                Local $BaseFolder = $Roms & "\" & $BaseRegion
 
                 MoveRevToBase($RevisionFolder, $BaseFolder)
                 MoveBaseToRev($BaseFolder, $RevisionFolder)
@@ -581,6 +654,13 @@ EndIf
 
 ; SORT FILES INTO ALPHABETICAL FOLDERS
 SortByAlphabet($Roms)
+
+; DELETE EMPTY FOLDERS
+DeleteEmptyFolders($Roms)
+
+; STREAMLINE FOLDERS
+StreamlineFolders($Aftermarket)
+StreamlineFolders($Unlicensed)
 
 ; DELETE EMPTY FOLDERS
 DeleteEmptyFolders($Roms)
