@@ -1,3 +1,11 @@
+# **NOTICE: DEVELOPMENT HAS PERMANENTLY CONCLUDED**
+
+### **The engine has been completely rewritten, modernized, and succeeded by a new monolithic standalone utility.**
+
+## **[CURSE Universal ROM Sorting Engine](https://github.com/disharmonium/curse)**
+
+
+
 # Universal ROM Sorter
 
 **Universal ROM Sorter (URS)** is a tool designed to sort a ROM collection (No-Intro naming convention) into an organized folder structure.
