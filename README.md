@@ -1,4 +1,4 @@
-# **NOTICE: DEVELOPMENT HAS PERMANENTLY CONCLUDED**
+# **DEVELOPMENT HAS PERMANENTLY CONCLUDED**
 
 ### **The engine has been completely rewritten, modernized, and succeeded by a new monolithic standalone utility.**
 
